@@ -27,5 +27,7 @@ services:
       - METRICS_RETENTION=720h
       - METRICS_MEMORY=262144
       - METRICS_RESOLUTION=1s
+      - ORCHESTRATOR_USER=orc_client_user
+      - ORCHESTRATOR_PASSWORD=orc_client_password
 #      - SERVER_USER=pmm
 #      - SERVER_PASSWORD=abc123

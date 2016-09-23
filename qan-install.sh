@@ -4,6 +4,7 @@ set -eu
 
 service mysql start
 
+# Install QAN API.
 # START=no SYSINT=no because Supervisor starts and manages these processes.
 cd /opt/qan-api
 START="no" SYSINT="no" ./install
