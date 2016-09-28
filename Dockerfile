@@ -1,90 +1,11 @@
-FROM ubuntu:latest
+FROM percona/pmm-server:latest
 
-EXPOSE 80 443
 
-WORKDIR /opt
+# ############################# #
+# Add several custom dashboards #
+# ############################# #
 
-# ########################### #
-# MySQL and other system pkgs #
-# ########################### #
+WORKDIR /var/lib/grafana/dashboards
 
-RUN apt-get -y update && apt-get install -y \
-	apt-transport-https \
-	curl \
-	git \
-	unzip \
-	nginx \
-	mysql-server \
-	python \
-	python-requests \
-	supervisor && \
-	rm -f /etc/cron.daily/apt && \
-	useradd -s /bin/false pmm
-
-# ########## #
-# Prometheus #
-# ########## #
-
-RUN curl -s -LO https://github.com/prometheus/prometheus/releases/download/v1.0.2/prometheus-1.0.2.linux-amd64.tar.gz && \
-	mkdir -p prometheus/data && \
-	chown -R pmm:pmm /opt/prometheus/data && \
-	tar xfz prometheus-1.0.2.linux-amd64.tar.gz --strip-components=1 -C prometheus
-COPY prometheus.yml /opt/prometheus/
-
-# ####### #
-# Grafana #
-# ####### #
-
-RUN echo "deb https://packagecloud.io/grafana/stable/debian/ wheezy main" > /etc/apt/sources.list.d/grafana.list && \
-	curl -s https://packagecloud.io/gpg.key | apt-key add - && \
-	apt-get -y update && \
-	apt-get -y install grafana && \
-	git clone https://github.com/percona/grafana-dashboards.git && \
-	git clone -b alias2instance https://github.com/roman-vynar/grafana_mongodb_dashboards.git
-COPY import-dashboards.py grafana-postinstall.sh VERSION /opt/
-RUN /opt/grafana-postinstall.sh
-
-# ###### #
-# Consul #
-# ###### #
-
-RUN curl -s -LO https://releases.hashicorp.com/consul/0.6.4/consul_0.6.4_linux_amd64.zip && \
-	unzip consul_0.6.4_linux_amd64.zip && \
-	mkdir -p /opt/consul-data && \
-	chown -R pmm:pmm /opt/consul-data
-
-# ##### #
-# Nginx #
-# ##### #
-
-COPY nginx.conf nginx-ssl.conf /etc/nginx/
-RUN touch /etc/nginx/.htpasswd
-
-# ########################### #
-# Supervisor and landing page # 
-# ########################### #
-
-COPY landing-page/ /opt/landing-page/
-COPY supervisord.conf /etc/supervisor/supervisord.conf
-COPY entrypoint.sh /opt
-
-# ####################### #
-# Percona Query Analytics #
-# ####################### #
-
-COPY pt-archiver /usr/bin/
-COPY purge-qan-data /etc/cron.daily
-COPY qan-install.sh /opt
-ADD https://www.percona.com/downloads/TESTING/pmm/percona-qan-api-1.0.4-x86_64.tar.gz \
-    https://www.percona.com/downloads/TESTING/pmm/percona-qan-app-1.0.4.tar.gz \
-    /opt/
-RUN mkdir qan-api && \
-        tar zxf percona-qan-api-1.0.4-x86_64.tar.gz --strip-components=1 -C qan-api && \
-        mkdir qan-app && \
-        tar zxf percona-qan-app-1.0.4.tar.gz --strip-components=1 -C qan-app && \
-	/opt/qan-install.sh
-
-# ##### #
-# Start #
-# ##### #
-CMD ["/opt/entrypoint.sh"]
+RUN wget https://raw.githubusercontent.com/infinityworksltd/graf-db/master/dashboards/Rancher_Stats.json
+RUN wget https://raw.githubusercontent.com/xinity/graf-db/master/dashboards/Container_Stats.json
