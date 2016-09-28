@@ -20,3 +20,11 @@ RUN wget https://raw.githubusercontent.com/xinity/graf-db/master/dashboards/Cont
 
 COPY conf/tweak-prom.yml /tmp
 RUN cat /tmp/tweak-prom.yml >> /opt/prometheus.yml
+
+
+# ######################## #
+# Activate dashboards.json #
+# ######################## #
+
+COPY conf/grafana-dashs.yml /tmp
+RUN cat /tmp/grafana-dashs.yml >> /etc/grafana/grafana.ini
