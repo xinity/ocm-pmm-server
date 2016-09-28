@@ -1,5 +1,8 @@
 FROM percona/pmm-server:latest
 
+MAINTAINER Rachid Zarouali <rzarouali@gmail.com>
+
+RUN apt-get install wget -qqy
 
 # ############################# #
 # Add several custom dashboards #
