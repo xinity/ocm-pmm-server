@@ -19,7 +19,7 @@ RUN wget https://raw.githubusercontent.com/xinity/graf-db/master/dashboards/Cont
 # ############################## #
 
 COPY conf/tweak-prom.yml /tmp
-RUN cat /tmp/tweak-prom.yml >> /opt/prometheus.yml
+RUN cat /tmp/tweak-prom.yml >> /opt/prometheus/prometheus.yml
 
 
 # ######################## #
